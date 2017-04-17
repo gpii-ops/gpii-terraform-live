@@ -6,4 +6,8 @@ terragrunt = {
   terraform {
     source = "../../../gpii-terraform/modules/worker"
   }
+
+  dependencies {
+    paths = ["../base"]
+  }
 }
