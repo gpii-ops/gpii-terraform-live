@@ -4,6 +4,6 @@ terragrunt = {
   }
 
   terraform {
-    source = "../../../gpii-terraform/modules/base"
+    source = "../../../gpii-terraform//modules/base"
   }
 }
