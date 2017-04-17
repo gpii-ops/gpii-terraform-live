@@ -1,6 +1,6 @@
 # gpii-terraform-live
 
-Following the pattern laid out in [How to create reusable infrastructure with Terraform modules](https://blog.gruntwork.io/how-to-create-reusable-infrastructure-with-terraform-modules) and [Terragrunt: Remote Terraform configurations](https://github.com/gruntwork-io/terragrunt#remote-terraform-configuration), this repo describes the state of deployed infrastructure ("houses"). The modules ("blueprints") live [here](https://github.com/mrtyler/gpii-terraform).
+Following the pattern laid out in "[How to create reusable infrastructure with Terraform modules](https://blog.gruntwork.io/how-to-create-reusable-infrastructure-with-terraform-modules)" and "[Terragrunt: Remote Terraform configurations](https://github.com/gruntwork-io/terragrunt#remote-terraform-configuration)", this repo describes the state of deployed infrastructure ("houses"). The modules ("blueprints") live "[here](https://github.com/mrtyler/gpii-terraform).
 
 ## Getting Started
 
