@@ -1,0 +1,7 @@
+.*.sw?
+.bundle/
+graph*.png
+.kitchen/
+.terraform/
+test/inspec.lock
+vendor/

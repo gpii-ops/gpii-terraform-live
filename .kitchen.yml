@@ -1,0 +1,28 @@
+---
+driver:
+  name: terraform
+
+provisioner:
+  name: terraform
+  variable_files:
+    - testing.tfvars
+
+platforms:
+  - name: centos
+
+transport:
+  name: ssh
+  ssh_key: ~/.ssh/aws_donkey.pem
+
+verifier:
+  name: terraform
+  format: doc
+  groups:
+    - name: default
+      controls:
+        - operating_system
+      hostnames: public_ip
+      username: centos
+
+suites:
+  - name: default
