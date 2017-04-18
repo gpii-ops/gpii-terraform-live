@@ -7,3 +7,5 @@ terragrunt = {
     source = "../../../gpii-terraform//modules/base"
   }
 }
+
+environment = "dev"
