@@ -5,17 +5,24 @@ terragrunt = {
 
   terraform {
     source = "../../../gpii-terraform//modules/worker"
+
+    extra_arguments "environment" {
+      arguments = [
+        "-var", "environment=dev",
+      ]
+      commands = [
+        # This set comes from the example in
+        # https://github.com/gruntwork-io/terragrunt#passing-extra-command-line-arguments-to-terraform
+        "apply",
+        "plan",
+        "import",
+        "push",
+        "refresh"
+      ]
+    }
   }
 
   dependencies {
     paths = ["../base"]
   }
 }
-
-# NOTE: This value MUST match the value that will be calculated by terragrunt's
-# path_relative_to_include(). Otherwise, we will discover the remote state from
-# the wrong environment.
-#
-# I wish we could calculate this value from the terragrunt function or from the
-# local path on disk but I couldn't figure a way :(.
-environment = "dev"
