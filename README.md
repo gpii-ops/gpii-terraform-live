@@ -27,7 +27,6 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 
 1. Install [terraform-inventory](https://github.com/adammck/terraform-inventory).
 1. Clone https://github.com/inclusive-design/ops and `cd` into the `ansible/` directory.
-   * If https://github.com/inclusive-design/ops/pull/74 is still open, you'll need to clone [my fork](https://github.com/mrtyler/ops) instead.
 1. `TF_STATE=$(find "$TMPDIR/terragrunt-download" -name terraform.tfstate -path '*/worker/*' | xargs ls -tr | tail -1) ANSIBLE_REMOTE_PORT=22 ansible-playbook -i /usr/local/bin/terraform-inventory deploy_containers_gpii_stg.yml --user centos`
 
 ### Manual testing
