@@ -2,15 +2,17 @@
 # want shared production and stage environments, we don't want to share dev or
 # testing environments.
 #
-# NOTE: the calculated values here MUST match the value var.environment or
-# data.terraform_remote_state for data passing will not work.
+# NOTE: the hardcoded var.environment value (e.g. "dev") MUST match in all
+# included terragrunt stanzas. This means the var.environment value MUST match
+# the name of the environment on disk since this value is used in calculating
+# paths elsewhere.
 terragrunt = {
   lock {
     backend = "dynamodb"
     config {
       # We're one level lower in the hierarchy, so add that back to the
       # beginning.
-      state_file_id = "dev/${path_relative_to_include()}"
+      state_file_id = "dev-${get_env("USER", "unknown-user")}/${path_relative_to_include()}"
     }
   }
 
@@ -21,7 +23,7 @@ terragrunt = {
       bucket = "gpii-terraform-state"
       # We're one level lower in the hierarchy, so add that back to the
       # beginning.
-      key = "dev/${path_relative_to_include()}/terraform.tfstate"
+      key = "dev-${get_env("USER", "unknown-user")}/${path_relative_to_include()}/terraform.tfstate"
       region = "us-east-1"
     }
   }

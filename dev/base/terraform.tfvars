@@ -6,9 +6,12 @@ terragrunt = {
   terraform {
     source = "../../../gpii-terraform//modules/base"
 
+    # We jump through the hoop of passing `environment` via the command line
+    # (automatically via `extra_arguments`) so that we can use terragrunt's
+    # get_env() helper.
     extra_arguments "environment" {
       arguments = [
-        "-var", "environment=dev",
+        "-var", "environment=dev-${get_env("USER", "unknown-user")}",
       ]
       commands = [
         # This set comes from the example in
@@ -17,7 +20,9 @@ terragrunt = {
         "plan",
         "import",
         "push",
-        "refresh"
+        "refresh",
+        # I added these when I ran into errors
+        "destroy"
       ]
     }
   }

@@ -20,8 +20,7 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 1. `cd` into the `gpii-terraform-live/dev/` directory.
 1. `terragrunt apply-all`
    * The first time this is run in a given account, terragrunt will prompt you to confirm the creation of a DynamoDB entry (for terragrunt locking) and an S3 bucket (for terraform remote state). You must also "opt-in" to use of the Amazon Marketplace CentOS 7 image (the API returns an error with a link to a page where you click buttons).
-   * For now we have a single shared dev environment for everyone.
-   * Feel free to experiment and make changes, but please leave the environment in the configured state, i.e. so that `terragrunt apply-all` returns no changes.
+   * This will create an independent dev environment called `dev-$USER` (or `dev-unknown-user` if you don't have `$USER` set in your shell environment -- but you should set it so you don't conflict with someone else who doesn't have `$USER` set).
 
 ### Configure an environment
 
