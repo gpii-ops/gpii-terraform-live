@@ -1,0 +1,62 @@
+#!/bin/sh
+#
+# This wrapper (rather naively) translates vanilla terraform commands, as
+# provided by kitchen-terraform, into terragrunt *-all commands.
+#
+# validate -> nothing -- terragrunt downloads modules into a tmp folder which is not easy to get a hold of. For now, wel'l skip this step.
+#
+# plan -> nothing -- plan doesn't work when modules communicate via
+# remote_state, which only happens on apply.
+#
+# get -> nothing -- get doesn't work with terragrunt module style.
+#
+# apply -> apply-all, removing path to terraform.tfplan file (since we skip the
+# plan step) and '-state=/path' (since it confuses our remote state situation
+# -- note that this removes the isolation kitchen provides by using its own
+# state file; i.e. kitchen will work directly on the user's terraform-managed
+# resources in this environment rather than spinning up its own).
+#
+# output -> output-all.
+#
+# destroy -> destroy-all.
+#
+# Other subcommands are passed through as-is. 'version' and 'get' are the only
+# subcommands called by kitchen that aren't described above.
+#
+# Other notes:
+# * Be careful with debug statements: kitchen expects 'output' to emit json and
+# will complain if that doesn't happen.
+#
+# * This script should be a unit-tested ruby script but I'm hacking up this
+# quick shell script as a proof of concept.
+
+if echo "$*" | grep -Eq "\b(validate|plan|get)\b" ; then
+    echo "terragrunt_wrapper: Skipping subcommand: $*"
+    exit 0
+fi
+DRY_RUN=""
+if echo "$*" | grep -Eq "\W--dry-run\b" ; then
+    DRY_RUN=1
+fi
+# Apparently MacOS sed doesn't understand '|' or '+' :( so use some
+# workarounds.
+#    sed -e 's,/Users/tyler/rtf/gpii-terraform-live/dev/base/.kitchen/kitchen-terraform/default-centos/terraform.tfplan,,g' | \
+#    sed -e 's#-state=/Users/tyler/rtf/gpii-terraform-live/dev/base/.kitchen/kitchen-terraform/default-centos/terraform.tfstate##g'
+massaged_args=$(echo "$*" \
+    | sed -e 's#\(apply\)#\1-all#' \
+    | sed -e 's#\(output\)#\1-all#' \
+    | sed -e 's#\(destroy\)#\1-all#' \
+    | sed -e 's#[^[:blank:]]\{0,255\}terraform.tfplan##g' \
+    | sed -e 's#-state=[^[:blank:]]\{0,255\}##g' \
+)
+cmd="terragrunt $massaged_args"
+if echo "$cmd" | grep -Eq "\W-json=true\b" ; then
+    cmd="$cmd | jq -s 'add'"
+fi
+if [ -n "$DRY_RUN" ] ; then
+    echo "Dry run! Would have run: $cmd"
+else
+    # Terragrunt prompts before any *-all command (even if -input=false, in which
+    # case terragrunt exits immediately with an error).
+    yes | eval $cmd || echo "Command ($cmd) exited non-zero. I'm returning zero anyway to cover failures in output-all."
+fi
