@@ -6,6 +6,22 @@ terragrunt = {
   terraform {
     source = "../../../gpii-terraform//modules/worker"
 
+    # Force Terraform to keep trying to acquire a lock for up to 20 minutes if someone else already has the lock
+    extra_arguments "retry_lock" {
+      arguments = [
+        "-lock-timeout=20m"
+      ]
+      commands = [
+        "init",
+        "apply",
+        "refresh",
+        "import",
+        "plan",
+        "taint",
+        "untaint"
+      ]
+    }
+
     # We jump through the hoop of passing `environment` via the command line
     # (automatically via `extra_arguments`) so that we can use terragrunt's
     # get_env() helper.

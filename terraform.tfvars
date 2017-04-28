@@ -9,8 +9,27 @@ terragrunt = {
 
       # Tell Terraform to do locking using DynamoDB. Terragrunt will
       # automatically create this table for you if it doesn't already exist.
-      ### lock_table = "gpii-terraform-lock-table_${path_relative_to_include()}"
       lock_table = "gpii-terraform-lock-table"
+    }
+  }
+
+  terraform {
+    # Force Terraform to keep trying to acquire a lock for up to 20 minutes if someone else already has the lock
+    extra_arguments "retry_lock" {
+      commands = [
+        "init",
+        "apply",
+        "refresh",
+        "import",
+        "plan",
+        "taint",
+        "untaint"
+      ]
+
+      arguments = [
+        #"-lock-timeout=20m"
+        "-lock-timeout=20m"
+      ]
     }
   }
 }
