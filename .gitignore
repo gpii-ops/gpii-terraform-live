@@ -1,7 +1,8 @@
 .*.sw?
 .bundle/
-graph*.png
 .kitchen/
 .terraform/
+graph*.png
+tags
 test/inspec.lock
 vendor/
