@@ -40,8 +40,6 @@ if echo "$*" | grep -Eq "\W--dry-run\b" ; then
 fi
 # Apparently MacOS sed doesn't understand '|' or '+' :( so use some
 # workarounds.
-#    sed -e 's,/Users/tyler/rtf/gpii-terraform-live/dev/base/.kitchen/kitchen-terraform/default-centos/terraform.tfplan,,g' | \
-#    sed -e 's#-state=/Users/tyler/rtf/gpii-terraform-live/dev/base/.kitchen/kitchen-terraform/default-centos/terraform.tfstate##g'
 massaged_args=$(echo "$*" \
     | sed -e 's#\(apply\)#\1-all#' \
     | sed -e 's#\(output\)#\1-all#' \
@@ -49,7 +47,8 @@ massaged_args=$(echo "$*" \
     | sed -e 's#[^[:blank:]]\{0,255\}terraform.tfplan##g' \
     | sed -e 's#-state=[^[:blank:]]\{0,255\}##g' \
 )
-cmd="terragrunt $massaged_args"
+# #@# cmd="terragrunt $massaged_args"
+cmd="~/code/go/bin/terragrunt $massaged_args --terragrunt-ignore-dependency-errors"
 if echo "$cmd" | grep -Eq "\W-json=true\b" ; then
     cmd="$cmd | jq -s 'add'"
 fi
