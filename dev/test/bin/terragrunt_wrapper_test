@@ -1,6 +1,6 @@
 #!/bin/bash
 
-base_cmd="./terragrunt_wrapper --dry-run"
+base_cmd="$(dirname $0)/terragrunt_wrapper --dry-run"
 
 success () {
     echo "PASS"
