@@ -47,12 +47,19 @@ massaged_args=$(echo "$*" \
     | sed -e 's#[^[:blank:]]*terraform.tfplan##g' \
     | sed -e 's#-state=[^[:blank:]]*##g' \
 )
-cmd="terragrunt $massaged_args --terragrunt-non-interactive --terragrunt-ignore-dependency-errors"
+cmd="terragrunt $massaged_args --terragrunt-non-interactive"
+if echo "$cmd" | grep -Eq "\boutput-all\b" ; then
+    cmd="$cmd --terragrunt-ignore-dependency-errors"
+fi
 if echo "$cmd" | grep -Eq "\W-json=true\b" ; then
     cmd="$cmd | jq -s 'add'"
+fi
+# Repeat this check because this trap for non-zero exit needs to be the very last thing.
+if echo "$cmd" | grep -Eq "\boutput-all\b" ; then
+    cmd="$cmd || echo \"Command ($cmd) exited non-zero. I'm returning zero anyway to cover failures in output-all.\""
 fi
 if [ -n "$DRY_RUN" ] ; then
     echo "Dry run! Would have run: $cmd"
 else
-    eval $cmd || echo "Command ($cmd) exited non-zero. I'm returning zero anyway to cover failures in output-all."
+    eval $cmd
 fi

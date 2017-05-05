@@ -45,6 +45,13 @@ echo -n "-state -> deleted..."
 out=$($base_cmd whatever -state=/path/to/some/state)
 ! echo $out | grep -q "/some/state" && success || fail "$out"
 
+echo -n "output -> ignore-dependency-errors..."
+out=$($base_cmd output)
+echo $out | grep -q -- "--terragrunt-ignore-dependency-errors" && success || fail "$out"
 echo -n "-json -> jq..."
 out=$($base_cmd whatever -json=true)
 echo $out | grep -q "jq" && success || fail "$out"
+
+echo -n "output -> || exit 0..."
+out=$($base_cmd output)
+echo $out | grep -q -- "|| echo" && success || fail "$out"
