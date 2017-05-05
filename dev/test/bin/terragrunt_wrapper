@@ -35,7 +35,7 @@ if echo "$*" | grep -Eq "\b(validate|plan|get)\b" ; then
     exit 0
 fi
 DRY_RUN=""
-if echo "$*" | grep -Eq "\W--dry-run\b" ; then
+if echo "$*" | grep -Eq -- "--dry-run\b" ; then
     DRY_RUN=1
 fi
 # Apparently MacOS sed doesn't understand '|' or '+' :( so use some

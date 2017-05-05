@@ -1,0 +1,50 @@
+#!/bin/bash
+
+base_cmd="./terragrunt_wrapper --dry-run"
+
+success () {
+    echo "PASS"
+}
+
+fail () {
+    echo "FAIL"
+    echo "out:"
+    echo "$out"
+    exit 1
+}
+
+echo -n "validate -> skipped..."
+out=$($base_cmd validate)
+echo $out | grep -q "Skipping subcommand:" && success || fail "$out"
+
+echo -n "plan -> skipped..."
+out=$($base_cmd plan)
+echo $out | grep -q "Skipping subcommand:" && success || fail "$out"
+
+echo -n "get -> skipped..."
+out=$($base_cmd get)
+echo $out | grep -q "Skipping subcommand:" && success || fail "$out"
+
+echo -n "apply -> apply-all..."
+out=$($base_cmd apply)
+echo $out | grep -q "apply-all" && success || fail "$out"
+
+echo -n "output -> output-all..."
+out=$($base_cmd output)
+echo $out | grep -q "output-all" && success || fail "$out"
+
+echo -n "destroy -> destroy-all..."
+out=$($base_cmd destroy)
+echo $out | grep -q "destroy-all" && success || fail "$out"
+
+echo -n "terraform.tfplan -> deleted..."
+out=$($base_cmd whatever -out=/path/to/terraform.tfplan)
+! echo $out | grep -q "terraform.tfplan" && success || fail "$out"
+
+echo -n "-state -> deleted..."
+out=$($base_cmd whatever -state=/path/to/some/state)
+! echo $out | grep -q "/some/state" && success || fail "$out"
+
+echo -n "-json -> jq..."
+out=$($base_cmd whatever -json=true)
+echo $out | grep -q "jq" && success || fail "$out"
