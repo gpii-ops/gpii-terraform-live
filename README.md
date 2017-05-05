@@ -30,9 +30,10 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 
 ### Manual testing
 
-1. Get a copy of `gpii-key.pem` from `~deploy/.ssh` on `i40`.
+1. Get a copy of `gpii-key.pem` from `~deploy/.ssh` on `i40`. Put it at `~/.ssh/gpii-key.pem`
+   * The destination path is hardcoded into `.kitchen.yml`.
    * The configuration process could create user accounts (there is already ansible code in the `ops` repo to do this) but for now we'll use a shared key.
-1. `ssh-add /path/to/gpii-key.pem`
+1. `ssh-add ~/.ssh/gpii-key.pem`
 1. In your clone of this repo, `terragrunt output-all` and find `public_ip`. (You can also just look in your scrollback.)
 1. `ssh centos@<public_ip>`
 1. `sudo docker ps` to see that containers are running

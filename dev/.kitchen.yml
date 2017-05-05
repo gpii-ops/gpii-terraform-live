@@ -13,7 +13,7 @@ platforms:
 
 transport:
   name: ssh
-  ssh_key: ~/.ssh/aws_donkey.pem
+  ssh_key: ~/.ssh/gpii-key.pem
 
 verifier:
   name: terraform
