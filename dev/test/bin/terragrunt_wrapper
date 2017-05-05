@@ -30,14 +30,28 @@
 # * This script should be a unit-tested ruby script but I'm hacking up this
 # quick shell script as a proof of concept.
 
-if echo "$*" | grep -Eq "\b(validate|plan|get)\b" ; then
-    echo "terragrunt_wrapper: Skipping subcommand: $*"
-    exit 0
-fi
 DRY_RUN=""
 if echo "$*" | grep -Eq -- "--dry-run\b" ; then
     DRY_RUN=1
 fi
+SKIP_NEXT_APPLY_FILE="terragrunt_wrapper.skip_next_apply"
+
+if echo "$*" | grep -Eq "\W-state=" && echo "$*" | grep -Eq "\W-destroy=true" ; then
+    state_dir=$(echo "$*" | sed -e 's,.*[[:blank:]]-state=\([^[:blank:]]*\).*,\1,g')
+    state_dir=$(dirname "$state_dir")
+    echo "state_dir = $state_dir"
+    if [ -n "$DRY_RUN" ] ; then
+        echo "Dry run! Would have written: $state_dir/$SKIP_NEXT_APPLY_FILE"
+    else
+        touch "$state_dir/$skip_next_apply_file"
+    fi
+fi
+
+if echo "$*" | grep -Eq "\b(validate|plan|get)\b" ; then
+    echo "terragrunt_wrapper: Skipping subcommand: $*"
+    exit 0
+fi
+
 # Apparently MacOS sed doesn't understand '|' or '+' :( so use some
 # workarounds. [:<:] and [:>:] are \b (word boundaries).
 massaged_args=$(echo "$*" \
@@ -46,17 +60,23 @@ massaged_args=$(echo "$*" \
     | sed -e 's#[^[:blank:]]*terraform.tfplan##g' \
     | sed -e 's#-state=[^[:blank:]]*##g' \
 )
+
 cmd="terragrunt $massaged_args --terragrunt-non-interactive"
+
 if echo "$cmd" | grep -Eq "\boutput-all\b" ; then
     cmd="$cmd --terragrunt-ignore-dependency-errors"
 fi
+
+# This must go (almost) last since it introduces a pipeline.
 if echo "$cmd" | grep -Eq "\W-json=true\b" ; then
     cmd="$cmd | jq -s 'add'"
 fi
+
 # Repeat this check because this trap for non-zero exit needs to be the very last thing.
 if echo "$cmd" | grep -Eq "\boutput-all\b" ; then
     cmd="$cmd || echo \"Command ($cmd) exited non-zero. I'm returning zero anyway to cover failures in output-all.\""
 fi
+
 if [ -n "$DRY_RUN" ] ; then
     echo "Dry run! Would have run: $cmd"
 else

@@ -41,6 +41,17 @@ echo -n "-state -> deleted..."
 out=$($base_cmd whatever -state=/path/to/some/state)
 ! echo $out | grep -q "/some/state" && success || fail "$out"
 
+echo -n "-state + -destroy=true -> create skip_next_apply..."
+tmp_state_dir="terragrunt_wrapper_test.tmp"
+skip_next_apply_file="terragrunt_wrapper.skip_next_apply"
+out=$($base_cmd whatever -state=$tmp_state_dir/state -destroy=true)
+echo $out | grep -q "Would have written: $tmp_state_dir/$skip_next_apply_file" && success || fail "$out"
+#echo -n "apply + skip_next_apply -> skip apply..."
+#out=$($base_cmd apply -state=$tmp_state_dir/state)
+#! echo $out | grep -q "/some/state" && success || fail "$out"
+#mkdir "$tmp_state_dir"
+#rm -rf "$tmp_state_dir"
+
 echo -n "output -> ignore-dependency-errors..."
 out=$($base_cmd output)
 echo $out | grep -q -- "--terragrunt-ignore-dependency-errors" && success || fail "$out"
