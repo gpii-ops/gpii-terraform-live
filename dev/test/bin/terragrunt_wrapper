@@ -47,14 +47,12 @@ massaged_args=$(echo "$*" \
     | sed -e 's#[^[:blank:]]*terraform.tfplan##g' \
     | sed -e 's#-state=[^[:blank:]]*##g' \
 )
-cmd="terragrunt $massaged_args --terragrunt-ignore-dependency-errors"
+cmd="terragrunt $massaged_args --terragrunt-non-interactive --terragrunt-ignore-dependency-errors"
 if echo "$cmd" | grep -Eq "\W-json=true\b" ; then
     cmd="$cmd | jq -s 'add'"
 fi
 if [ -n "$DRY_RUN" ] ; then
     echo "Dry run! Would have run: $cmd"
 else
-    # Terragrunt prompts before any *-all command (even if -input=false, in which
-    # case terragrunt exits immediately with an error).
-    yes | eval $cmd || echo "Command ($cmd) exited non-zero. I'm returning zero anyway to cover failures in output-all."
+    eval $cmd || echo "Command ($cmd) exited non-zero. I'm returning zero anyway to cover failures in output-all."
 fi
