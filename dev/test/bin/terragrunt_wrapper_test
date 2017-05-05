@@ -39,7 +39,7 @@ echo $out | grep -q "destroy-all" && success || fail "$out"
 
 echo -n "terraform.tfplan -> deleted..."
 out=$($base_cmd whatever -out=/path/to/terraform.tfplan)
-! echo $out | grep -q "terraform.tfplan" && success || fail "$out"
+! echo $out | grep -q -- "-out=" && success || fail "$out"
 
 echo -n "-state -> deleted..."
 out=$($base_cmd whatever -state=/path/to/some/state)

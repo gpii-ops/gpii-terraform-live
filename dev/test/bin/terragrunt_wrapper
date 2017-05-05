@@ -44,8 +44,8 @@ massaged_args=$(echo "$*" \
     | sed -e 's#\(apply\)#\1-all#' \
     | sed -e 's#\(output\)#\1-all#' \
     | sed -e 's#\(destroy\)#\1-all#' \
-    | sed -e 's#[^[:blank:]]\{0,255\}terraform.tfplan##g' \
-    | sed -e 's#-state=[^[:blank:]]\{0,255\}##g' \
+    | sed -e 's#[^[:blank:]]*terraform.tfplan##g' \
+    | sed -e 's#-state=[^[:blank:]]*##g' \
 )
 cmd="terragrunt $massaged_args --terragrunt-ignore-dependency-errors"
 if echo "$cmd" | grep -Eq "\W-json=true\b" ; then
