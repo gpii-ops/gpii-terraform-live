@@ -39,11 +39,11 @@ if echo "$*" | grep -Eq -- "--dry-run\b" ; then
     DRY_RUN=1
 fi
 # Apparently MacOS sed doesn't understand '|' or '+' :( so use some
-# workarounds.
+# workarounds. [:<:] and [:>:] are \b (word boundaries).
 massaged_args=$(echo "$*" \
-    | sed -e 's#\(apply\)#\1-all#' \
-    | sed -e 's#\(output\)#\1-all#' \
-    | sed -e 's#\(destroy\)#\1-all#' \
+    | sed -e 's#\([[:<:]]\)\(apply\)\([[:>:]]\)#\1\2-all\3#' \
+    | sed -e 's#\([[:<:]]\)\(output\)\([[:>:]]\)#\1\2-all\3#' \
+    | sed -e 's#\([[:<:]]\)\(destroy\)\([[:>:]]\)#\1\2-all\3#' \
     | sed -e 's#[^[:blank:]]*terraform.tfplan##g' \
     | sed -e 's#-state=[^[:blank:]]*##g' \
 )
