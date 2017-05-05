@@ -43,7 +43,6 @@ fi
 massaged_args=$(echo "$*" \
     | sed -e 's#\([[:<:]]\)\(apply\)\([[:>:]]\)#\1\2-all\3#' \
     | sed -e 's#\([[:<:]]\)\(output\)\([[:>:]]\)#\1\2-all\3#' \
-    | sed -e 's#\([[:<:]]\)\(destroy\)\([[:>:]]\)#\1\2-all\3#' \
     | sed -e 's#[^[:blank:]]*terraform.tfplan##g' \
     | sed -e 's#-state=[^[:blank:]]*##g' \
 )

@@ -33,10 +33,6 @@ echo -n "output -> output-all..."
 out=$($base_cmd output)
 echo $out | grep -q "output-all" && success || fail "$out"
 
-echo -n "destroy -> destroy-all..."
-out=$($base_cmd destroy)
-echo $out | grep -q "destroy-all" && success || fail "$out"
-
 echo -n "terraform.tfplan -> deleted..."
 out=$($base_cmd whatever -out=/path/to/terraform.tfplan)
 ! echo $out | grep -q -- "-out=" && success || fail "$out"
