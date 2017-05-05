@@ -30,38 +30,49 @@
 # * This script should be a unit-tested ruby script but I'm hacking up this
 # quick shell script as a proof of concept.
 
+args="$*"
 DRY_RUN=""
-if echo "$*" | grep -Eq -- "--dry-run\b" ; then
+if echo "$args" | grep -Eq -- "--dry-run\b" ; then
     DRY_RUN=1
 fi
 SKIP_NEXT_APPLY_FILE="terragrunt_wrapper.skip_next_apply"
 
-if echo "$*" | grep -Eq "\W-state=" && echo "$*" | grep -Eq "\W-destroy=true" ; then
-    state_dir=$(echo "$*" | sed -e 's,.*[[:blank:]]-state=\([^[:blank:]]*\).*,\1,g')
+if echo "$args" | grep -Eq "\W-state=" ; then
+    state_dir=$(echo "$args" | sed -e 's,.*[[:blank:]]-state=\([^[:blank:]]*\).*,\1,g')
     state_dir=$(dirname "$state_dir")
-    echo "state_dir = $state_dir"
+fi
+if [ -n "$state_dir" ] && echo "$args" | grep -Eq "\W-destroy=true" ; then
     if [ -n "$DRY_RUN" ] ; then
-        echo "Dry run! Would have written: $state_dir/$SKIP_NEXT_APPLY_FILE"
+        echo "Dry run! Would have created: $state_dir/$SKIP_NEXT_APPLY_FILE"
     else
         touch "$state_dir/$skip_next_apply_file"
     fi
+    args=$(echo "$args" | sed -e 's#\([[:<:]]\)\(plan\)\([[:>:]]\)#\1destroy-all\3#')
 fi
 
-if echo "$*" | grep -Eq "\b(validate|plan|get)\b" ; then
-    echo "terragrunt_wrapper: Skipping subcommand: $*"
+if echo "$args" | grep -Eq "\b(apply)\b" && [ -n "$state_dir" ] && [ -f "$state_dir/$SKIP_NEXT_APPLY_FILE" ] ; then
+    echo "terragrunt_wrapper: Skipping this apply because the previous run specified '-destroy=true"
+    echo "(which caused $state_dir/$SKIP_NEXT_APPLY_FILE to be created)."
+    echo "I am removing this file now."
+    rm -f "$state_dir/$SKIP_NEXT_APPLY_FILE"
+    exit 0
+fi
+
+if echo "$args" | grep -Eq "\b(validate|plan|get)\b" ; then
+    echo "terragrunt_wrapper: Skipping subcommand: $args"
     exit 0
 fi
 
 # Apparently MacOS sed doesn't understand '|' or '+' :( so use some
 # workarounds. [:<:] and [:>:] are \b (word boundaries).
-massaged_args=$(echo "$*" \
+args=$(echo "$args" \
     | sed -e 's#\([[:<:]]\)\(apply\)\([[:>:]]\)#\1\2-all\3#' \
     | sed -e 's#\([[:<:]]\)\(output\)\([[:>:]]\)#\1\2-all\3#' \
     | sed -e 's#[^[:blank:]]*terraform.tfplan##g' \
     | sed -e 's#-state=[^[:blank:]]*##g' \
 )
 
-cmd="terragrunt $massaged_args --terragrunt-non-interactive"
+cmd="terragrunt $args --terragrunt-non-interactive"
 
 if echo "$cmd" | grep -Eq "\boutput-all\b" ; then
     cmd="$cmd --terragrunt-ignore-dependency-errors"

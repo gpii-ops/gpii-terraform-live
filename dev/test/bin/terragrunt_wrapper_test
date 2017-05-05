@@ -13,6 +13,26 @@ fail () {
     exit 1
 }
 
+echo -n "-state + -destroy=true -> create skip_next_apply..."
+tmp_state_dir="terragrunt_wrapper_test.tmp"
+skip_next_apply_file="terragrunt_wrapper.skip_next_apply"
+out=$($base_cmd whatever -state=$tmp_state_dir/state -destroy=true)
+echo $out | grep -q "Would have created: $tmp_state_dir/$skip_next_apply_file" && success || fail "$out"
+
+echo -n "plan + -state + -destroy=true -> destroy-all..."
+out=$($base_cmd plan -state=/path/to/some/state -destroy=true)
+echo $out | grep -q "destroy-all" && success || fail "$out"
+
+echo -n "apply + skip_next_apply -> skip apply..."
+tmp_state_dir="terragrunt_wrapper_test.tmp"
+skip_next_apply_file="terragrunt_wrapper.skip_next_apply"
+mkdir "$tmp_state_dir" || fail "Couldn't mkdir $tmp_state_dir. Delete it and try again."
+touch "$tmp_state_dir/$skip_next_apply_file"
+out=$($base_cmd apply -state=$tmp_state_dir/state)
+rm -f "$tmp_state_dir/$skip_next_apply_file"
+rmdir "$tmp_state_dir"
+echo $out | grep -q "Skipping this apply" && success || fail "$out"
+
 echo -n "validate -> skipped..."
 out=$($base_cmd validate)
 echo $out | grep -q "Skipping subcommand:" && success || fail "$out"
@@ -40,17 +60,6 @@ out=$($base_cmd whatever -out=/path/to/terraform.tfplan)
 echo -n "-state -> deleted..."
 out=$($base_cmd whatever -state=/path/to/some/state)
 ! echo $out | grep -q "/some/state" && success || fail "$out"
-
-echo -n "-state + -destroy=true -> create skip_next_apply..."
-tmp_state_dir="terragrunt_wrapper_test.tmp"
-skip_next_apply_file="terragrunt_wrapper.skip_next_apply"
-out=$($base_cmd whatever -state=$tmp_state_dir/state -destroy=true)
-echo $out | grep -q "Would have written: $tmp_state_dir/$skip_next_apply_file" && success || fail "$out"
-#echo -n "apply + skip_next_apply -> skip apply..."
-#out=$($base_cmd apply -state=$tmp_state_dir/state)
-#! echo $out | grep -q "/some/state" && success || fail "$out"
-#mkdir "$tmp_state_dir"
-#rm -rf "$tmp_state_dir"
 
 echo -n "output -> ignore-dependency-errors..."
 out=$($base_cmd output)
