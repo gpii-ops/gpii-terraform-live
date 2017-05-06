@@ -42,9 +42,9 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 
 ### Automated testing
 
-_Skip this step for now._ I broke testing when I reorganized the code into modules :/. I'm still thinking about how to bring it back.
-
 1. Install ruby and bundle (for [kitchen](https://github.com/test-kitchen/test-kitchen) and [kitchen-terraform](https://github.com/newcontext-oss/kitchen-terraform)).
-1. Clone this repo and `cd` into the root of it.
+1. Install [jq](https://stedolan.github.io/jq/).
+1. Clone this repo and `cd` into `dev/`.
 1. `bundle install --path vendor/bundle`
+1. Get a copy of `gpii-key.pem`, as described in "Manual testing".
 1. `bundle exec kitchen test`

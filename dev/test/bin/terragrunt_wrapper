@@ -47,7 +47,10 @@ if [ -n "$state_dir" ] && echo "$args" | grep -Eq "\W-destroy=true" ; then
     else
         touch "$state_dir/$skip_next_apply_file"
     fi
-    args=$(echo "$args" | sed -e 's#\([[:<:]]\)\(plan\)\([[:>:]]\)#\1destroy-all\3#')
+    args=$(echo "$args" \
+        | sed -e 's#\([[:<:]]\)plan\([[:>:]]\)#\1destroy-all\2#' \
+        | sed -e 's#[[:blank:]]-destroy=true##' \
+    )
 fi
 
 if echo "$args" | grep -Eq "\b(apply)\b" && [ -n "$state_dir" ] && [ -f "$state_dir/$SKIP_NEXT_APPLY_FILE" ] ; then
