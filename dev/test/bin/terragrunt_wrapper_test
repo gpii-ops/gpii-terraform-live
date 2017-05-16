@@ -49,6 +49,10 @@ echo -n "get -> skipped..."
 out=$($base_cmd get)
 echo $out | grep -q "Skipping subcommand:" && success || fail "$out"
 
+echo -n "show -> skipped..."
+out=$($base_cmd show)
+echo $out | grep -q "Skipping subcommand:" && success || fail "$out"
+
 echo -n "apply -> apply-all..."
 out=$($base_cmd apply)
 echo $out | grep -q "apply-all" && success || fail "$out"

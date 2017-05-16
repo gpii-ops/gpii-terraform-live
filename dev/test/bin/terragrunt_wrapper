@@ -62,7 +62,7 @@ if echo "$args" | grep -Eq "\b(apply)\b" && [ -n "$state_dir" ] && [ -f "$state_
     exit 0
 fi
 
-if echo "$args" | grep -Eq "\b(validate|plan|get)\b" ; then
+if echo "$args" | grep -Eq "\b(validate|plan|get|show)\b" ; then
     echo "terragrunt_wrapper: Skipping subcommand: $args"
     exit 0
 fi
