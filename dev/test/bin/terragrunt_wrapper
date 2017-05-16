@@ -37,19 +37,20 @@ if echo "$args" | grep -Eq -- "--dry-run\b" ; then
 fi
 SKIP_NEXT_APPLY_FILE="terragrunt_wrapper.skip_next_apply"
 
-if echo "$args" | grep -Eq "\W-state=" ; then
-    state_dir=$(echo "$args" | sed -e 's,.*[[:blank:]]-state=\([^[:blank:]]*\).*,\1,g')
+if echo "$args" | grep -Eq "\W-state(-out)*=" ; then
+    state_dir=$(echo "$args" | sed -e 's,.*[[:blank:]]-state\(-out\)*=\([^[:blank:]]*\).*,\2,g')
     state_dir=$(dirname "$state_dir")
 fi
 if [ -n "$state_dir" ] && echo "$args" | grep -Eq "\W-destroy=true" ; then
     if [ -n "$DRY_RUN" ] ; then
         echo "Dry run! Would have created: $state_dir/$SKIP_NEXT_APPLY_FILE"
     else
-        touch "$state_dir/$skip_next_apply_file"
+        touch "$state_dir/$SKIP_NEXT_APPLY_FILE"
     fi
     args=$(echo "$args" \
         | sed -e 's#\([[:<:]]\)plan\([[:>:]]\)#\1destroy-all\2#' \
         | sed -e 's#[[:blank:]]-destroy=true##' \
+        | sed -e 's#[[:blank:]]/[^[:blank:]]*##' \
     )
 fi
 
