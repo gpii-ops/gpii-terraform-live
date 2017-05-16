@@ -3,27 +3,36 @@
 # This wrapper (rather naively) translates vanilla terraform commands, as
 # provided by kitchen-terraform, into terragrunt *-all commands.
 #
-# validate -> nothing -- terragrunt downloads modules into a tmp folder which is not easy to get a hold of. For now, wel'l skip this step.
+# validate -> nothing -- terragrunt downloads modules into a tmp folder which
+# is not easy to get a hold of. For now, wel'l skip this step.
 #
 # plan -> nothing -- plan doesn't work when modules communicate via
 # remote_state, which only happens on apply.
 #
+# plan -destroy -> destroy-all -- Since we skip the plan phase anyway, we
+# invoke destroy-all immediately. We also write a signal file so that we skip
+# the next apply (designed to consume the output of `plan -destroy`, but in our
+# case it would just create the environment all over again).
+#
 # get -> nothing -- get doesn't work with terragrunt module style.
 #
+# show -> nothing -- show doesn't work with terragrunt module style. This is
+# used by `kitchen destroy`, whereas we just `destroy-all`.
+#
 # apply -> apply-all, removing path to terraform.tfplan file (since we skip the
-# plan step) and '-state=/path' (since it confuses our remote state situation
-# -- note that this removes the isolation kitchen provides by using its own
-# state file; i.e. kitchen will work directly on the user's terraform-managed
-# resources in this environment rather than spinning up its own).
+# plan step) and '-state-out=/path' (since it confuses our remote state
+# situation -- note that this removes the isolation kitchen provides by using
+# its own state file; i.e. kitchen will work directly on the user's
+# terraform-managed resources in this environment rather than spinning up a
+# separate environment).
 #
 # output -> output-all.
 #
-# destroy -> destroy-all.
-#
-# Other subcommands are passed through as-is. 'version' and 'get' are the only
-# subcommands called by kitchen that aren't described above.
+# Other subcommands are passed through as-is. 'version' is the only subcommand
+# called by kitchen that isn't described above.
 #
 # Other notes:
+#
 # * Be careful with debug statements: kitchen expects 'output' to emit json and
 # will complain if that doesn't happen.
 #
