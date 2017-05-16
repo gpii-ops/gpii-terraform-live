@@ -19,10 +19,10 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 1. Clone this repo, [gpii-terraform-live](https://github.com/mrtyler/gpii-terraform-live), into a directory next to the clone of the modules repo (i.e. `gpii-terraform/` and `gpii-terraform-live/` should be in the same directory).
 1. `cd` into the `gpii-terraform-live/dev/` directory.
 1. `terragrunt apply-all`
-   * The first time this is run in a given account, terragrunt will prompt you to confirm the creation of a DynamoDB entry (for locking) and an S3 bucket (for remote state). You must also "opt-in" to use of the Amazon Marketplace CentOS 7 image (the API returns an error with a link to a page where you click buttons).
+   * The first time this is run in a given AWS account, terragrunt will prompt you to confirm the creation of a DynamoDB entry (for locking) and an S3 bucket (for remote state). You must also "opt-in" to use of the Amazon Marketplace CentOS 7 image (the API returns an error with a link to a page where you click buttons).
    * This will create an independent dev environment called `dev-$USER` (or `dev-unknown-user` if you don't have `$USER` set in your shell environment -- but you should set it so you don't conflict with someone else who doesn't have `$USER` set).
 
-### Configure an environment
+### Configure an environment with Ansible (deprecated)
 
 1. Install [terraform-inventory](https://github.com/adammck/terraform-inventory) into `/usr/local/bin` (or somewhere else and update the path in the command below).
 1. Clone [the internal ansible repo](https://github.com/inclusive-design/ops) and `cd` into the `ansible/` directory.
@@ -36,8 +36,8 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 1. `ssh-add ~/.ssh/gpii-key.pem`
 1. In your clone of this repo, `terragrunt output-all` and find `public_ip`. (You can also just look in your scrollback.)
 1. `ssh centos@<public_ip>`
-1. `sudo docker ps` to see that containers are running
-1. `curl localhost:38082/preferences/carla`
+1. `sudo docker ps` to see that containers are running (deprecated)
+1. `curl localhost:38082/preferences/carla` (deprecated)
    * If it returns some JSON, you have a working preferences server.
 
 ### Automated testing
@@ -48,10 +48,9 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 1. `bundle install --path vendor/bundle`
 1. Get a copy of `gpii-key.pem` and add it to your agent, as described in "Manual testing".
 1. `bundle exec kitchen test`
-   * This will create/test/destroy resources in the same `dev-$USER` environment that is managed with `terragrunt *-all`.
-   * `kitchen test` runs a series of phases: `create, converge, verify, destroy`. You can also run these phases by hand (e.g. `kitchen converge`).
+   * This will *destroy*/create/test/destroy resources in the same `dev-$USER` environment that is managed with `terragrunt *-all`.
+   * `kitchen test` runs a series of phases: `destroy, create, converge, verify, destroy`. You can also run these phases by hand (e.g. `kitchen converge`) -- do this if you don't want kitchen to destroy your existing environment.
    * Add `-l debug` to see more log output.
-   * The `destroy` step doesn't work yet. Use the steps in "Cleaning up" to clean up.
 
 ### Cleaning up
 
