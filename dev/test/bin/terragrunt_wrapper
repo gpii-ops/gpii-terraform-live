@@ -47,7 +47,7 @@ fi
 SKIP_NEXT_APPLY_FILE="terragrunt_wrapper.skip_next_apply"
 
 if echo "$args" | grep -Eq "\W-state(-out)*=" ; then
-    state_dir=$(echo "$args" | sed -e 's,.*[[:blank:]]-state\(-out\)*=\([^[:blank:]]*\).*,\2,g')
+    state_dir=$(echo "$args" | ruby -pe '$_.gsub! /.*\W-state(-out)*=(\S+).*/, "\\2"')
     state_dir=$(dirname "$state_dir")
 fi
 if [ -n "$state_dir" ] && echo "$args" | grep -Eq "\W-destroy=true" ; then
@@ -57,13 +57,13 @@ if [ -n "$state_dir" ] && echo "$args" | grep -Eq "\W-destroy=true" ; then
         touch "$state_dir/$SKIP_NEXT_APPLY_FILE"
     fi
     args=$(echo "$args" \
-        | sed -e 's#\([[:<:]]\)plan\([[:>:]]\)#\1destroy-all\2#' \
-        | sed -e 's#[[:blank:]]-destroy=true##' \
-        | sed -e 's#[[:blank:]]/[^[:blank:]]*##' \
+        | ruby -pe '$_.gsub! /(\b)plan(\b)/, "\\1destroy-all\\2"' \
+        | ruby -pe '$_.gsub! /\s-destroy=true/, ""' \
+        | ruby -pe '$_.gsub! %r{\s/\w*}, ""' \
     )
 fi
 
-if echo "$args" | grep -Eq "\b(apply)\b" && [ -n "$state_dir" ] && [ -f "$state_dir/$SKIP_NEXT_APPLY_FILE" ] ; then
+if echo "$args" | grep -Eq "\bapply\b" && [ -n "$state_dir" ] && [ -f "$state_dir/$SKIP_NEXT_APPLY_FILE" ] ; then
     echo "terragrunt_wrapper: Skipping this apply because the previous run specified '-destroy=true"
     echo "(which caused $state_dir/$SKIP_NEXT_APPLY_FILE to be created)."
     echo "I am removing this file now."
@@ -76,13 +76,11 @@ if echo "$args" | grep -Eq "\b(validate|plan|get|show)\b" ; then
     exit 0
 fi
 
-# Apparently MacOS sed doesn't understand '|' or '+' :( so use some
-# workarounds. [:<:] and [:>:] are \b (word boundaries).
 args=$(echo "$args" \
-    | sed -e 's#\([[:<:]]\)\(apply\)\([[:>:]]\)#\1\2-all\3#' \
-    | sed -e 's#\([[:<:]]\)\(output\)\([[:>:]]\)#\1\2-all\3#' \
-    | sed -e 's#[^[:blank:]]*terraform.tfplan##g' \
-    | sed -e 's#-state=[^[:blank:]]*##g' \
+    | ruby -pe '$_.gsub! /(\b)(apply)(\b)/, "\\1\\2-all\\3"' \
+    | ruby -pe '$_.gsub! /(\b)(output)(\b)/, "\\1\\2-all\\3"' \
+    | ruby -pe '$_.gsub! /\S*terraform.tfplan/, ""' \
+    | ruby -pe '$_.gsub! /-state=\S*/, ""' \
 )
 
 cmd="terragrunt $args --terragrunt-non-interactive"
