@@ -58,8 +58,8 @@ if [ -n "$state_dir" ] && echo "$args" | grep -Eq "\W-destroy=true" ; then
     fi
     args=$(echo "$args" \
         | ruby -pe '$_.gsub! /(\b)plan(\b)/, "\\1destroy-all\\2"' \
-        | ruby -pe '$_.gsub! /\s-destroy=true/, ""' \
-        | ruby -pe '$_.gsub! %r{\s/\w*}, ""' \
+        | ruby -pe '$_.gsub! /(\s)-destroy=true/, "\\1"' \
+        | ruby -pe '$_.gsub! %r{(\s)/\S*}, "\\1"' \
     )
 fi
 
