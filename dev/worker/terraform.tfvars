@@ -47,3 +47,5 @@ terragrunt = {
     paths = ["../base"]
   }
 }
+
+bucket = "gpii-terraform-state"

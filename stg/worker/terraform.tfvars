@@ -28,6 +28,7 @@ terragrunt = {
   }
 }
 
+bucket = "gpii-terraform-state"
 # NOTE: This value MUST match the value that will be calculated by terragrunt's
 # path_relative_to_include(). Otherwise, we will discover the remote state from
 # the wrong environment.
