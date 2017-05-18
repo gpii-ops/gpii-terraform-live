@@ -1,0 +1,6 @@
+before_script:
+  - which ruby
+
+test:
+  script:
+    - echo "LET'S RUN SOME TESTS OMG!"
