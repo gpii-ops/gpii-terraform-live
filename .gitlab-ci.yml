@@ -1,3 +1,9 @@
+before_script:
+  - cd dev && bundle install --path vendor/bundle
+
 test:
   script:
-    - cd dev && terragrunt apply-all
+    - cd dev && bundle exec kitchen test
+
+after_script:
+  - cd dev && terragrunt destroy-all --terragrunt-non-interactive
