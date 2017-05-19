@@ -26,9 +26,9 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 ### Configure SSH
 
 1. Get a copy of `gpii-key.pem` from `~deploy/.ssh` on `i40`. Put it at `~/.ssh/gpii-key.pem`
-   * The destination path is hardcoded into `.kitchen.yml`.
+   * The destination path is hardcoded into `.kitchen.yml` and the terraform code responsible for provisioning instances.
    * The configuration process could create user accounts (there is already ansible code in the `ops` repo to do this) but for now we'll use a shared key.
-1. `ssh-add ~/.ssh/gpii-key.pem`
+1. For ad-hoc debugging and ansible: `ssh-add ~/.ssh/gpii-key.pem`
 
 ### Configure an environment with Ansible (deprecated)
 
@@ -55,8 +55,8 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 1. `bundle install --path vendor/bundle`
 1. Configure ssh, as described in "Configure SSH".
 1. `bundle exec kitchen test`
-   * This will *destroy*/create/test/*destroy* resources in the same `dev-$USER` environment that is managed with `terragrunt *-all`.
-   * `kitchen test` runs a series of phases: `destroy, create, converge, verify, destroy`. You can run these phases by hand (e.g. `kitchen converge && kitchen verify`) to avoid *destroying the whole environment* after a successful test run.
+   * This will **destroy**/create/test/**destroy** resources in the same `dev-$USER` environment that is managed with `terragrunt *-all`.
+   * `kitchen test` runs a series of phases: `destroy, create, converge, verify, destroy`. You can run these phases by hand (e.g. `kitchen converge && kitchen verify`) to avoid **destroying the whole environment** after a successful test run.
    * Add `-l debug` to see more log output.
 
 ### Cleaning up
