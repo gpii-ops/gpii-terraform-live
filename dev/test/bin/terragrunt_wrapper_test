@@ -53,6 +53,12 @@ echo -n "show -> skipped..."
 out=$($base_cmd show)
 echo $out | grep -q "Skipping subcommand:" && success || fail "$out"
 
+echo -n "common args..."
+out=$($base_cmd whatever)
+echo $out | grep -q " --terragrunt-non-interactive" && success || fail "$out"
+echo -n "..."
+echo $out | grep -q " --terragrunt-source-update" && success || fail "$out"
+
 echo -n "apply -> apply-all..."
 out=$($base_cmd apply)
 echo $out | grep -q "apply-all" && success || fail "$out"

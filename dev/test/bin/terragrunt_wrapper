@@ -83,7 +83,7 @@ args=$(echo "$args" \
     | ruby -pe '$_.gsub! /-state=\S*/, ""' \
 )
 
-cmd="terragrunt $args --terragrunt-non-interactive"
+cmd="terragrunt $args --terragrunt-non-interactive --terragrunt-source-update"
 
 if echo "$cmd" | grep -Eq "\boutput-all\b" ; then
     cmd="$cmd --terragrunt-ignore-dependency-errors"
