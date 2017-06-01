@@ -1,0 +1,32 @@
+#!/bin/sh
+
+version=$1 ; shift
+env=$1 ; shift
+
+if [ -z "$version" ] || [ -z "$env" ] || [ -n "$*" ] ; then
+    echo "Usage: $0 <version> <env>"
+    exit 1
+fi
+
+if [ ! -d "$env/" ] ; then
+    echo "Could not find directory '$env/' in current directory."
+    exit 2
+fi
+
+echo "You are about to promote ***$version*** to ***$env***."
+echo
+echo "Are you sure? ^C to abort!"
+read
+
+for template in $(find "$env/" -name terraform.tfvars.erb) ; do
+    outfile=$(echo "$template" | sed -e 's/\.erb$//g')
+    erb version="$version" "$template" > "$outfile"
+    git add "$outfile"
+done
+
+git diff --cached
+echo
+echo "If the above looks correct:"
+echo
+echo "    git commit -m\"Promote version '$version' to env '$env'\" && git push origin HEAD"
+echo
