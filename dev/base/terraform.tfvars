@@ -21,7 +21,8 @@ terragrunt = {
         "import",
         "plan",
         "taint",
-        "untaint"
+        "untaint",
+        "destroy"
       ]
     }
 
