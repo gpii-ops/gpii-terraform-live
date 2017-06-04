@@ -5,29 +5,41 @@ variables:
 stages:
   - setup
   - dev
+  - promote-to-stg
   - stg
 
-setup:
-  stage: setup
-  - echo "$TMPDIR"  # So it's visible in the log
-  - mkdir "$TMPDIR"
+#setup:
+#  stage: setup
+#  script:
+#    - echo "$TMPDIR"  # So it's visible in the log
+#    - mkdir "$TMPDIR"
+#
+#dev:
+#  stage: dev
+#  script:
+#    - cd dev
+#    - bundle install --path "$TMPDIR/vendor/bundle"
+#    - bundle exec kitchen create -l debug
+#    - bundle exec kitchen converge -l debug
+#    - bundle exec kitchen verify -l debug
+#  after_script:
+#    - cd dev
+#    - bundle exec kitchen destroy -l debug
 
-dev:
-  stage: dev
+promote-to-stg:
+  stage: promote-to-stg
   script:
-    - cd dev
-    - bundle install --path "$TMPDIR/vendor/bundle"
-    - bundle exec kitchen test -l debug
-    - export datestamp="$(date '+%Y%m%d%H%M%S')"
-    - git tag "deploy-stg-$ds"
-    - git tag -f deploy-stg
-    - git push --tags origin
-  after_script:
-    - cd dev
-    - bundle exec kitchen destroy -l debug
+    - export DATESTAMP="$(date '+%Y%m%d%H%M%S')"  # e.g. 20170603220542
+    - echo "$DATESTAMP"  # So it's visible in the log
+    - git tag "deploy-stg-$DATESTAMP"
+    # gitlab is not clever enough to clean up an added remote and git complains
+    # if we add a remote that already exists.
+    - git remote | grep -q "^origin-rw" || git remote add origin-rw git@github.com:gpii-ops/gpii-terraform-live
+    - git push --tags origin-rw
 
 stg:
   stage: stg
   script:
     - cd stg
-    - terragrunt apply-all
+    - ls
+    - terragrunt apply-all --terragrunt-non-interactive
