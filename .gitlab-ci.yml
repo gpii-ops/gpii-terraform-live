@@ -2,16 +2,32 @@ variables:
   # Ownership/permission conflicts in /tmp/terragrunt-download are possible, so set TMPDIR to a path inside the build.
   TMPDIR: "$CI_PROJECT_DIR/gitlab-tmp"
 
-before_script:
-  - cd dev
+stages:
+  - setup
+  - dev
+  - stg
+
+setup:
+  stage: setup
   - echo "$TMPDIR"  # So it's visible in the log
   - mkdir "$TMPDIR"
-  - bundle install --path "$TMPDIR/vendor/bundle"
 
-test:
+dev:
+  stage: dev
   script:
+    - cd dev
+    - bundle install --path "$TMPDIR/vendor/bundle"
     - bundle exec kitchen test -l debug
+    - export datestamp="$(date '+%Y%m%d%H%M%S')"
+    - git tag "deploy-stg-$ds"
+    - git tag -f deploy-stg
+    - git push --tags origin
+  after_script:
+    - cd dev
+    - bundle exec kitchen destroy -l debug
 
-after_script:
-  - cd dev
-  - bundle exec kitchen destroy -l debug
+stg:
+  stage: stg
+  script:
+    - cd stg
+    - terragrunt apply-all
