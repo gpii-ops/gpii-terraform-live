@@ -7,7 +7,7 @@ terragrunt = {
   }
 
   terraform {
-    source = "github.com/gpii-ops/gpii-terraform//modules/base?ref=37268777c34fcb1d9a34648061bf42782108f9c2"
+    source = "github.com/gpii-ops/gpii-terraform//modules/base?ref=5fc4b39d7bb7230094d0529c09de3c228969aeb8"
 
     # Force Terraform to keep trying to acquire a lock for up to 20 minutes if someone else already has the lock
     extra_arguments "retry_lock" {
