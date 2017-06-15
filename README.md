@@ -64,6 +64,10 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 
 1. From the directory where you ran `terragrunt apply-all`, run `terragrunt destroy-all`.
 
+### Running manually in non-dev environments (stg, prd)
+
+See [CI-CD.md#running-in-non-dev-environments](https://github.com/gpii-ops/gpii-terraform-live/blob/master/CI-CD.md#running-manually-in-non-dev-environments-stg-prd)
+
 ## Continuous Integration / Continuous Delivery
 
-See [CI-CD.md](https://github.com/mrtyler/gpii-terraform-live/blob/master/CI-CD.md)
+See [CI-CD.md](https://github.com/gpii-ops/gpii-terraform-live/blob/master/CI-CD.md)

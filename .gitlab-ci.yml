@@ -37,7 +37,7 @@ dev:
 promote-to-stg:
   stage: promote-to-stg
   script:
-    - export DATESTAMP="$(date '+%Y%m%d%H%M%S')"  # e.g. 20170603220542
+    - export DATESTAMP="$(date -u '+%Y%m%d%H%M%S')"  # e.g. 20170603220542. Uses UTC.
     - echo "$DATESTAMP"  # So it's visible in the log
     - git tag "deploy-stg-$DATESTAMP"
     # gitlab is not clever enough to clean up an added remote and git complains
