@@ -6,18 +6,18 @@ task :ci => :test
 # We need a DNS zone before kops will do anything, so we have to create it in a
 # separate terraform run. We use a separate tmpdir so we don't mix up these
 # downloaded modules with the main terraform run's downloaded modules.
-TMPDIR_PREREQS = File.absolute_path("../rake-prereqs-tmp")
+TMPDIR_PREREQS = File.absolute_path("../rake-tmp-prereq")
 
 directory TMPDIR_PREREQS
 CLOBBER << TMPDIR_PREREQS
 
-rule "#{TMPDIR_PREREQS}/terragrunt" => TMPDIR_PREREQS do
+task :apply_prereqs => TMPDIR_PREREQS do
   sh "cd ../k8s-cluster-dns && TMPDIR=#{TMPDIR_PREREQS} terragrunt apply-all --terragrunt-non-interactive"
 end
 CLEAN << "#{TMPDIR_PREREQS}/terragrunt"
 
-task :teardown_prereqs do
-  unless ENV["RAKE_NO_TEARDOWN"]
+task :destroy_prereqs do
+  unless ENV["RAKE_NO_DESTROY"]
     sh "cd ../k8s-cluster-dns && TMPDIR=#{TMPDIR_PREREQS} terragrunt destroy-all --terragrunt-non-interactive"
   end
 end
@@ -29,28 +29,20 @@ ENV["TMPDIR"] = TMPDIR
 directory TMPDIR
 CLOBBER << TMPDIR
 
-rule "#{TMPDIR}/terragrunt" => [TMPDIR, "#{TMPDIR_PREREQS}/terragrunt"] do
-  # Really what we want is get-all, i.e. to download all the modules so we can
-  # generate terraform code which we will then run, but that's not a thing.
-  # plan-all downloads the modules as a side-effect, so we use that.
-  sh "terragrunt plan-all"
-end
-CLEAN << "#{TMPDIR}/terragrunt"
 
-### RAKEFILES = FileList.new("#{TMPDIR}/terragrunt/**/Rakefile")
 RAKEFILES = FileList.new("../../gpii-terraform/modules/**/Rakefile")
 
-task :generate_modules => "#{TMPDIR}/terragrunt" do
+task :generate_modules => [TMPDIR, :apply_prereqs] do
   RAKEFILES.each do |rakefile|
     sh "cd #{File.dirname(rakefile)} && rake generate"
   end
 end
 
-# This logic duplicates logic on the gpii-terraform-live side. I suspect this
-# side will win in the long run, but I'm punting deduplication until the
-# design is clearer.
 if ENV["TF_VAR_environment"].nil?
-  user = ENV["USER"] || "unknown-user"
+  if ENV["USER"].nil? || ENV["USER"].empty?
+    raise "ERROR: Please set $USER (or $TF_VAR_environment, if you're sure you know what you're doing)."
+  end
+  user = ENV["USER"]
   ENV["TF_VAR_environment"] = "dev-#{user}"
 end
 if ENV["TF_VAR_cluster_name"].nil?
@@ -77,14 +69,15 @@ task :test => :generate_modules do
     sleep sleep_secs
     sh "bundle exec kitchen verify -l debug"
   ensure
-    Rake::Task["teardown"].invoke
+    Rake::Task["destroy"].invoke
   end
 end
+CLEAN << "#{TMPDIR}/terragrunt"
 
-task :teardown do
-  unless ENV["RAKE_NO_TEARDOWN"]
+task :destroy do
+  unless ENV["RAKE_NO_DESTROY"]
     sh "bundle exec kitchen destroy -l debug"
-    Rake::Task["teardown_prereqs"].invoke
+    Rake::Task["destroy_prereqs"].invoke
   end
 end
 

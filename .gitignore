@@ -3,8 +3,8 @@
 .kitchen/
 .terraform/
 graph*.png
-rake-prereqs-tmp
 rake-tmp
+rake-tmp-prereqs
 tags
 test/inspec.lock
 vendor/
