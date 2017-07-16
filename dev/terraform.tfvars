@@ -2,7 +2,7 @@
 # production and stage environments, we don't want to share dev or testing
 # environments.
 #
-# NOTE: var.environment (e.g. "dev") MUST match in all included terragrunt
+# NOTE: var.environment (e.g. "stg") MUST match in all included terragrunt
 # stanzas. This means var.environment MUST match the name of the environment on
 # disk since the name on disk is used in calculating paths elsewhere.
 terragrunt = {

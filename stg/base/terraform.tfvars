@@ -27,5 +27,3 @@ terragrunt = {
     }
   }
 }
-
-environment = "stg"
