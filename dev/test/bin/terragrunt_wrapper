@@ -96,7 +96,7 @@ fi
 
 # Repeat this check because this trap for non-zero exit needs to be the very last thing.
 if echo "$cmd" | grep -Eq "\boutput-all\b" ; then
-    cmd="$cmd || echo \"Command ($cmd) exited non-zero. I'm returning zero anyway to cover failures in output-all.\""
+    cmd="$cmd || >&2 echo \"Command ($cmd) exited non-zero. I'm returning zero anyway to cover failures in output-all.\""
 fi
 
 if [ -n "$DRY_RUN" ] ; then
