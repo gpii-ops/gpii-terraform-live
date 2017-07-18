@@ -1,13 +1,8 @@
 require 'rake/clean'
 
-task :default => :ci
-task :ci => :test
-
 # We need a DNS zone before kops will do anything, so we have to create it in a
 # separate terraform run. We use a separate tmpdir so we don't mix up these
 # downloaded modules with the main terraform run's downloaded modules.
-TMPDIR_PREREQS = File.absolute_path("../rake-tmp-prereq")
-
 directory TMPDIR_PREREQS
 CLOBBER << TMPDIR_PREREQS
 
@@ -23,12 +18,10 @@ task :destroy_prereqs do
 end
 
 
-TMPDIR = File.absolute_path("../rake-tmp")
 ENV["TMPDIR"] = TMPDIR
 
 directory TMPDIR
 CLOBBER << TMPDIR
-
 
 RAKEFILES = FileList.new("../../gpii-terraform/modules/**/Rakefile")
 
@@ -36,17 +29,6 @@ task :generate_modules => [TMPDIR, :apply_prereqs] do
   RAKEFILES.each do |rakefile|
     sh "cd #{File.dirname(rakefile)} && rake generate"
   end
-end
-
-if ENV["TF_VAR_environment"].nil?
-  if ENV["USER"].nil? || ENV["USER"].empty?
-    raise "ERROR: Please set $USER (or $TF_VAR_environment, if you're sure you know what you're doing)."
-  end
-  user = ENV["USER"]
-  ENV["TF_VAR_environment"] = "dev-#{user}"
-end
-if ENV["TF_VAR_cluster_name"].nil?
-  ENV["TF_VAR_cluster_name"] = "k8s-#{ENV["TF_VAR_environment"]}.gpii.net"
 end
 
 task :wait_for_api do
@@ -74,7 +56,7 @@ task :wait_for_api do
   puts
   puts "Waiting for API to have DNS..."
   puts "(Note that this will wait potentially forever for DNS records to appear.)"
-  puts "(You can Ctrl-C out of this safely. You may need to run :destroy afterward.)"
+  puts "(You can Ctrl-C out of this safely. You may need to run :destroy_dev afterward.)"
 
   api_hostname = "api.#{ENV['TF_VAR_cluster_name']}"
   sleep_secs = 20
@@ -84,8 +66,12 @@ task :wait_for_api do
     # directly from the Terraform run that created the cluster (there is a
     # dedicated output for this, consumed by kitchen-terraform). This is
     # simpler, though.
-    ### --max-items 1 \
-    ### --query \"ResourceRecordSets[?Name == '#{api_hostname}.']\" \
+    #
+    # I tried to do the filtering in the aws cli with:
+    #
+    # --max-items 1 --query\"ResourceRecordSets[?Name == '#{api_hostname}.']\"
+    #
+    # but I couldn't get it to work.
     sh "aws route53 list-resource-record-sets \
       --hosted-zone-id '#{zone.chomp}' \
       | grep -q '#{api_hostname}' \
@@ -98,25 +84,6 @@ task :wait_for_api do
         sleep sleep_secs
       end
     end
-  end
-end
-
-task :test => :generate_modules do
-  sh "bundle exec kitchen create -l debug"
-  begin
-    sh "bundle exec kitchen converge -l debug"
-    Rake::Task["wait_for_api"].invoke
-    sh "bundle exec kitchen verify -l debug"
-  ensure
-    Rake::Task["destroy"].invoke
-  end
-end
-CLEAN << "#{TMPDIR}/terragrunt"
-
-task :destroy do
-  unless ENV["RAKE_NO_DESTROY"]
-    sh "bundle exec kitchen destroy -l debug"
-    Rake::Task["destroy_prereqs"].invoke
   end
 end
 

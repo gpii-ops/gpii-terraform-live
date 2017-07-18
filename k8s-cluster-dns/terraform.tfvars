@@ -1,6 +1,3 @@
-# NOTE! This file is generated from a template (and then committed).
-# Modify the template, not the output!
-
 terragrunt = {
   include {
     path = "${find_in_parent_folders()}"

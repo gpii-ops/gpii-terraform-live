@@ -1,0 +1,29 @@
+require 'rake/clean'
+import "../rakefiles/build.rake"
+
+TMPDIR_PREREQS = File.absolute_path("rake-tmp-prereq")
+TMPDIR = File.absolute_path("rake-tmp")
+
+if ENV["TF_VAR_environment"].nil?
+  ENV["TF_VAR_environment"] = "stg"
+end
+if ENV["TF_VAR_cluster_name"].nil?
+  ENV["TF_VAR_cluster_name"] = "k8s-#{ENV["TF_VAR_environment"]}.gpii.net"
+end
+
+task :default => :stg
+
+task :stg => :generate_modules do
+  sh "terragrunt apply-all --terragrunt-non-interactive"
+end
+CLEAN << "#{TMPDIR}/terragrunt"
+
+task :destroy_stg do
+  unless ENV["RAKE_NO_DESTROY"]
+    sh "terragrunt destroy-all --terragrunt-non-interactive"
+    Rake::Task["destroy_prereqs"].invoke
+  end
+end
+
+
+# vim: ts=2 sw=2:
