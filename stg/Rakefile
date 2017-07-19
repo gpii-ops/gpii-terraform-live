@@ -1,15 +1,15 @@
 require 'rake/clean'
 import "../rakefiles/build.rake"
 
-TMPDIR_PREREQS = File.absolute_path("../rake-tmp-prereq")
-TMPDIR = File.absolute_path("../rake-tmp")
-
 if ENV["TF_VAR_environment"].nil?
   ENV["TF_VAR_environment"] = "stg"
 end
 if ENV["TF_VAR_cluster_name"].nil?
   ENV["TF_VAR_cluster_name"] = "k8s-#{ENV["TF_VAR_environment"]}.gpii.net"
 end
+
+TMPDIR_PREREQS = File.absolute_path("../rake-tmp/#{ENV["TF_VAR_environment"]}-prereq")
+TMPDIR = File.absolute_path("../rake-tmp/#{ENV["TF_VAR_environment"]}")
 
 task :default => :stg
 

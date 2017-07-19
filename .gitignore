@@ -4,7 +4,6 @@
 .terraform/
 graph*.png
 rake-tmp
-rake-tmp-prereq
 tags
 test/inspec.lock
 vendor/
