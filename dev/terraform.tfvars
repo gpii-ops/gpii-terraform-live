@@ -13,7 +13,7 @@ terragrunt = {
       # We're one level lower in the hierarchy, so add that back to the
       # beginning.
       key = "dev-${get_env("USER", "unknown-user")}/${path_relative_to_include()}/terraform.tfstate"
-      region = "us-east-1"
+      region = "us-east-2"
       encrypt = true
 
       # Tell Terraform to do locking using DynamoDB. Terragrunt will

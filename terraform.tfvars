@@ -4,7 +4,7 @@ terragrunt = {
     config {
       bucket = "gpii-terraform-state"
       key = "${path_relative_to_include()}/terraform.tfstate"
-      region = "us-east-1"
+      region = "us-east-2"
       encrypt = true
 
       # Tell Terraform to do locking using DynamoDB. Terragrunt will
