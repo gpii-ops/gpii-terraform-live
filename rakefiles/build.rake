@@ -7,13 +7,13 @@ directory TMPDIR_PREREQS
 CLOBBER << TMPDIR_PREREQS
 
 task :apply_prereqs => TMPDIR_PREREQS do
-  sh "cd ../k8s-cluster-dns && TMPDIR=#{TMPDIR_PREREQS} terragrunt apply-all --terragrunt-non-interactive"
+  sh "cd ../prereqs/#{ENV["RAKE_ENV_SHORT"]}/k8s-cluster-dns && TMPDIR=#{TMPDIR_PREREQS} terragrunt apply-all --terragrunt-non-interactive"
 end
 CLEAN << "#{TMPDIR_PREREQS}/terragrunt"
 
 task :destroy_prereqs do
   unless ENV["RAKE_NO_DESTROY"]
-    sh "cd ../k8s-cluster-dns && TMPDIR=#{TMPDIR_PREREQS} terragrunt destroy-all --terragrunt-non-interactive"
+    sh "cd ../prereqs/#{ENV["RAKE_ENV_SHORT"]}/k8s-cluster-dns && TMPDIR=#{TMPDIR_PREREQS} terragrunt destroy-all --terragrunt-non-interactive"
   end
 end
 

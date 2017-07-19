@@ -7,6 +7,9 @@ end
 if ENV["TF_VAR_cluster_name"].nil?
   ENV["TF_VAR_cluster_name"] = "k8s-#{ENV["TF_VAR_environment"]}.gpii.net"
 end
+if ENV["RAKE_ENV_SHORT"].nil?
+  ENV["RAKE_ENV_SHORT"] = File.basename(File.dirname(__FILE__))
+end
 
 TMPDIR_PREREQS = File.absolute_path("../rake-tmp/#{ENV["TF_VAR_environment"]}-prereqs")
 TMPDIR = File.absolute_path("../rake-tmp/#{ENV["TF_VAR_environment"]}")
