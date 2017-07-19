@@ -1,8 +1,8 @@
 require 'rake/clean'
 import "../rakefiles/build.rake"
 
-TMPDIR_PREREQS = File.absolute_path("rake-tmp-prereq")
-TMPDIR = File.absolute_path("rake-tmp")
+TMPDIR_PREREQS = File.absolute_path("../rake-tmp-prereq")
+TMPDIR = File.absolute_path("../rake-tmp")
 
 if ENV["TF_VAR_environment"].nil?
   if ENV["USER"].nil? || ENV["USER"].empty?
