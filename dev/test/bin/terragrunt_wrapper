@@ -50,7 +50,7 @@ if echo "$args" | grep -Eq "\W-state(-out)*=" ; then
     state_dir=$(echo "$args" | ruby -pe '$_.gsub! /.*\W-state(-out)*=(\S+).*/, "\\2"')
     state_dir=$(dirname "$state_dir")
 fi
-if [ -n "$state_dir" ] && echo "$args" | grep -Eq "\W-destroy=true" ; then
+if [ -n "$state_dir" ] && echo "$args" | grep -Eq "\W-destroy" ; then
     if [ -n "$DRY_RUN" ] ; then
         echo "Dry run! Would have created: $state_dir/$SKIP_NEXT_APPLY_FILE"
     else
@@ -58,13 +58,13 @@ if [ -n "$state_dir" ] && echo "$args" | grep -Eq "\W-destroy=true" ; then
     fi
     args=$(echo "$args" \
         | ruby -pe '$_.gsub! /(\b)plan(\b)/, "\\1destroy-all\\2"' \
-        | ruby -pe '$_.gsub! /(\s)-destroy=true/, "\\1"' \
+        | ruby -pe '$_.gsub! /(\s)-destroy/, "\\1"' \
         | ruby -pe '$_.gsub! %r{(\s)/\S*}, "\\1"' \
     )
 fi
 
 if echo "$args" | grep -Eq "\bapply\b" && [ -n "$state_dir" ] && [ -f "$state_dir/$SKIP_NEXT_APPLY_FILE" ] ; then
-    echo "terragrunt_wrapper: Skipping this apply because the previous run specified '-destroy=true'"
+    echo "terragrunt_wrapper: Skipping this apply because the previous run specified '-destroy'"
     echo "(which caused $state_dir/$SKIP_NEXT_APPLY_FILE to be created)."
     echo "I am removing this file now."
     rm -f "$state_dir/$SKIP_NEXT_APPLY_FILE"
@@ -90,7 +90,7 @@ if echo "$cmd" | grep -Eq "\boutput-all\b" ; then
 fi
 
 # This must go (almost) last since it introduces a pipeline.
-if echo "$cmd" | grep -Eq "\W-json=true\b" ; then
+if echo "$cmd" | grep -Eq "\W-json\b" ; then
     cmd="$cmd | jq -s 'add'"
 fi
 

@@ -13,17 +13,17 @@ fail () {
     exit 1
 }
 
-echo -n "-state + -destroy=true -> create skip_next_apply..."
+echo -n "-state + -destroy -> create skip_next_apply..."
 tmp_state_dir="terragrunt_wrapper_test.tmp"
 skip_next_apply_file="terragrunt_wrapper.skip_next_apply"
-out=$($base_cmd whatever -state=$tmp_state_dir/state -destroy=true)
+out=$($base_cmd whatever -state=$tmp_state_dir/state -destroy)
 echo $out | grep -q "Would have created: $tmp_state_dir/$skip_next_apply_file" && success || fail "$out"
 
-echo -n "plan + -state + -destroy=true + path -> destroy-all..."
-out=$($base_cmd plan -state=/path/to/some/state -destroy=true /path/to/tf/dir)
+echo -n "plan + -state + -destroy + path -> destroy-all..."
+out=$($base_cmd plan -state=/path/to/some/state -destroy /path/to/tf/dir)
 echo $out | grep -q "destroy-all" && success || fail "$out"
 echo -n "..."
-! echo $out | grep -q -- "-destroy=true" && success || fail "$out"
+! echo $out | grep -q -- "-destroy" && success || fail "$out"
 echo -n "..."
 ! echo $out | grep -q "/path/to/tf/dir" && success || fail "$out"
 
@@ -79,9 +79,9 @@ echo -n "output -> ignore-dependency-errors..."
 out=$($base_cmd output)
 echo $out | grep -q -- "--terragrunt-ignore-dependency-errors" && success || fail "$out"
 echo -n "-json -> jq..."
-out=$($base_cmd whatever -json=true)
+out=$($base_cmd whatever -json)
 echo $out | grep -q "jq" && success || fail "$out"
 
 echo -n "output -> || exit 0..."
 out=$($base_cmd output)
-echo $out | grep -q -- "|| echo" && success || fail "$out"
+echo $out | grep -q -- "|| >&2 echo" && success || fail "$out"
