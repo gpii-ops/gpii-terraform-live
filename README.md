@@ -1,23 +1,25 @@
 # gpii-terraform-live
 
-Following the pattern laid out in "[How to create reusable infrastructure with Terraform modules](https://blog.gruntwork.io/how-to-create-reusable-infrastructure-with-terraform-modules)" and "[Terragrunt: Remote Terraform configurations](https://github.com/gruntwork-io/terragrunt#remote-terraform-configuration)", this repo describes the state of deployed infrastructure ("houses"). The modules ("blueprints") live [here](https://github.com/gpii-ops/gpii-terraform).
+**DEPRECATED! Go to [gpii-terraform](https://github.com/mrtyler/gpii-terraform) instead. This repo remains to support archaeological expeditions.**
+
+Following the pattern laid out in "[How to create reusable infrastructure with Terraform modules](https://blog.gruntwork.io/how-to-create-reusable-infrastructure-with-terraform-modules-25526d65f73d)" and "[Terragrunt: Remote Terraform configurations](https://github.com/gruntwork-io/terragrunt#keep-your-remote-state-configuration-dry)", this repo describes the state of deployed infrastructure ("houses"). The modules ("blueprints") live [here](https://github.com/mrtyler/gpii-terraform-modules).
 
 ## Getting Started
 
 ### Configure your machine
 
 1. Install [terraform](https://releases.hashicorp.com/terraform/).
-1. Install [terragrunt](https://github.com/gruntwork-io/terragrunt#install).
-1. Get an AWS access key and secret key, as described [here](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-set-up.html).
+1. Install [terragrunt](https://github.com/gruntwork-io/terragrunt#install-terragrunt).
+1. Get an AWS access key and secret key, as described [here](http://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html).
 1. Configure AWS credentials:
    * _Recommended:_ Install the [AWS CLI](http://docs.aws.amazon.com/cli/latest/userguide/installing.html) and run `aws configure` per [the docs](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-quick-configuration). Fill in the access key and secret key you downloaded from Amazon. Leave the other prompts empty.
-   * _Or:_ Manually configure `~/.aws` to look like the examples [here](http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-multiple-profiles).
+   * _Or:_ Manually configure `~/.aws` to look like the examples [here](http://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html).
 1. Verify your AWS credential configuration: `aws sts get-caller-identity`
 
 ### Provision an environment
 
 1. Clone this repo.
-1. Clone [gpii-terraform, the repo containing the modules](https://github.com/gpii-ops/gpii-terraform), into a directory next to the clone of this repo (i.e. `gpii-terraform/` and `gpii-terraform-live/` should be in the same directory).
+1. Clone [gpii-terraform-modules, the repo containing the modules](https://github.com/mrtyler/gpii-terraform-modules), into a directory next to the clone of this repo (i.e. `gpii-terraform-modules/` and `gpii-terraform-live/` should be in the same directory).
 1. `cd` into the `gpii-terraform-live/dev/` directory.
 1. `terragrunt apply-all`
    * The first time this is run in a given AWS account, terragrunt will prompt you to confirm the creation of a DynamoDB entry (for locking) and an S3 bucket (for remote state). You must also "opt-in" to use of the Amazon Marketplace CentOS 7 image (the API returns an error with a link to a page where you click buttons).
@@ -52,7 +54,7 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
    * I like [rvm](https://rvm.io/) for ruby management.
    * If you're using a package manager, you may need to install "ruby-devel" as well.
 1. Install [jq](https://stedolan.github.io/jq/).
-1. Clone this repo, [gpii-terraform-live](https://github.com/gpii-ops/gpii-terraform-live), and `cd` into `dev/`.
+1. Clone this repo, [gpii-terraform-live](https://github.com/mrtyler/gpii-terraform-live), and `cd` into `dev/`.
 1. `bundle install --path vendor/bundle`
 1. Configure ssh, as described in [Configure SSH](#configure-ssh).
 1. `bundle exec kitchen test`
@@ -66,8 +68,8 @@ Following the pattern laid out in "[How to create reusable infrastructure with T
 
 ### Running manually in non-dev environments (stg, prd)
 
-See [CI-CD.md#running-in-non-dev-environments](https://github.com/gpii-ops/gpii-terraform-live/blob/master/CI-CD.md#running-manually-in-non-dev-environments-stg-prd)
+See [CI-CD.md#running-in-non-dev-environments](CI-CD.md#running-manually-in-non-dev-environments-stg-prd)
 
 ## Continuous Integration / Continuous Delivery
 
-See [CI-CD.md](https://github.com/gpii-ops/gpii-terraform-live/blob/master/CI-CD.md)
+See [CI-CD.md](CI-CD.md)

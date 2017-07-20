@@ -21,9 +21,9 @@ This repo is designed to fit into a CI/CD scheme: new commits are automatically 
       * The [internal ansible repo](https://github.com/inclusive-design/ops) has a playbook to do this: `config_host_gpii_ci_worker.yml`.
 
 ### Set up credentials
-   * [Set up .ssh with gpii-key.pem](https://github.com/gpii-ops/gpii-terraform-live#configure-ssh).
+   * [Set up .ssh with gpii-key.pem](README.md#configure-ssh).
       * Make sure the private key associated with the gitlab-runner Github account is available at `~gitlab-runner/.ssh/id_rsa.gpii-ci`.
-   * [Configure AWS creds](https://github.com/gpii-ops/gpii-terraform-live#configure-your-machine) for `gitlab-runner`.
+   * [Configure AWS creds](README.md#configure-your-machine) for `gitlab-runner`.
 
 ## Running manually in non-dev environments (stg, prd)
 
